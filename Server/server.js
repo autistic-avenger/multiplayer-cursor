@@ -19,6 +19,14 @@ app.get('/',(req,res)=>{
 io.on("connection",(socket)=>{
     console.log(socket.id ,"Connected 👾" );
     users[socket.id] = [undefined,undefined]
+
+    
+    socket.on("positions",(data)=>{
+      users[socket.id] = [data.x,data.y]
+      io.emit("updatedPos",users)
+    })
+
+
     socket.on("disconnect",()=>{
         delete users[socket.id];
         console.log(socket.id ,"Disconnected 👾");

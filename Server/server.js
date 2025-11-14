@@ -19,7 +19,6 @@ app.get('/',(req,res)=>{
 io.on("connection",(socket)=>{
     console.log(socket.id ,"Connected 👾" );
     users[socket.id] = [undefined,undefined]
-
     socket.on("disconnect",()=>{
         delete users[socket.id];
         console.log(socket.id ,"Disconnected 👾");

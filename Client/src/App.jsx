@@ -1,6 +1,6 @@
 import './App.css'
 import { io } from 'socket.io-client'
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 let socket = io("http://localhost:8080");
 
@@ -15,10 +15,12 @@ function App() {
   let x = useRef(undefined);
   let y = useRef(undefined);
 
+  let [arrows,setArrows] = useState([])
+
   setInterval(()=>{
     socket.emit("positions",{x,y})
-
-  },100)
+  },1000)
+  
   socket.on("updatedPos",(users)=>{
     console.log(users);
     })
@@ -27,11 +29,12 @@ function App() {
     x.current = e.pageX
     y.current = e.pageY
   }
-
+  
 
 
   return (
     <>
+    {arrows}
     <div onMouseMove={movedMouse} className='w-full h-screen bg-linear-to-t from-15% from-sky-500 to-indigo-500 flex justify-center items-center'>
       <h1 className='text-9xl font-Stalinist font-light '>Move</h1>
     </div>

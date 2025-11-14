@@ -4,7 +4,7 @@ import { io } from 'socket.io-client'
 let socket = io("http://localhost:8080");
 
 socket.on('connect', () => {
-  console.log('Connected to Socket.IO server');
+  console.log('Connected to Server Socket ID:', socket.id);
 });
 
 function App() {

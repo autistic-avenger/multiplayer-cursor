@@ -6,38 +6,35 @@ const Port = 8080
 const app = express()
 const server = http.createServer(app)
 
-const io = new Server(server,{
+const io = new Server(server, {
   cors: {
-    origin: "*",   
+    origin: "*",
     methods: ["GET", "POST"]
-  }})
+  }
+})
+
 let users = {}
 
-app.get('/',(req,res)=>{
-    res.send("Based Sigma!👌")
-})
-io.on("connection",(socket)=>{
-    console.log(socket.id ,"Connected 👾" );
-    users[socket.id] = [undefined,undefined]
-
-    
-    socket.on("positions",(data)=>{
-      users[socket.id] = [data.x,data.y]
-      io.emit("updatedPos",users)
-    })
-
-
-    socket.on("disconnect",()=>{
-        delete users[socket.id];
-        console.log(socket.id ,"Disconnected 👾");
-        
-    })
-        
+app.get('/', (req, res) => {
+  res.send("Based Sigma!👌")
 })
 
+io.on("connection", (socket) => {
+  console.log(socket.id, "Connected 👾");
 
+  users[socket.id] = [0, 0];
 
-server.listen(Port,()=>{
-    console.log(`Server is Up and Listening to:\nhttps://localhost:${Port}\n\n`)
-})
+  socket.on("positions", (data) => {
+    users[socket.id] = [data.x, data.y];
+    io.emit("updatedPos", users);
+  });
 
+  socket.on("disconnect", () => {
+    delete users[socket.id];
+    console.log(socket.id, "Disconnected 👾");
+  });
+});
+
+server.listen(Port, () => {
+  console.log(`Server listening on http://localhost:${Port}`);
+});

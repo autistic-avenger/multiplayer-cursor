@@ -1,45 +1,69 @@
 import './App.css'
 import { io } from 'socket.io-client'
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-let socket = io("http://localhost:8080");
+const socket = io("http://localhost:8080");
 
 socket.on('connect', () => {
-  console.log('Connected to Server Socket ID:', socket.id);
+  console.log("Connected:", socket.id);
 });
 
-
-
-
 function App() {
-  let x = useRef(undefined);
-  let y = useRef(undefined);
+  const x = useRef(0);
+  const y = useRef(0);
 
-  let [arrows,setArrows] = useState([])
+  const [arrows, setArrows] = useState({});
 
-  setInterval(()=>{
-    socket.emit("positions",{x,y})
-  },1000)
-  
-  socket.on("updatedPos",(users)=>{
-    console.log(users);
-    })
+  useEffect(() => {
+    setInterval(() => {
+      socket.emit("positions", { x: x.current, y: y.current });
+    },100);
 
-  function movedMouse(e){
-    x.current = e.pageX
-    y.current = e.pageY
+  }, []);
+
+  useEffect(() => {
+    const handler = (users) => {
+      setArrows(users);
+    };
+
+    socket.on("updatedPos", handler);
+  }, []);
+
+  function movedMouse(e) {
+    x.current = e.pageX;
+    y.current = e.pageY;
   }
-  
-
 
   return (
-    <>
-    {arrows}
-    <div onMouseMove={movedMouse} className='w-full h-screen bg-linear-to-t from-15% from-sky-500 to-indigo-500 flex justify-center items-center'>
-      <h1 className='text-9xl font-Stalinist font-light '>Move</h1>
+    <div
+      onMouseMove={movedMouse}
+      className="w-full h-screen bg-linear-to-t from-15% from-sky-500 to-indigo-500 flex justify-center items-center relative"
+    >
+      {Object.entries(arrows).map(([id, pos]) => {
+        if (id === socket.id) return null;
+        if (pos[0] === 0 || pos[1] === 0) return null;
+
+        return (
+          <img
+            key={id}
+            src="/pointer.png"
+            alt="pointer"
+            style={{
+              position: "absolute",
+              left: pos[0],
+              top: pos[1],
+              width: 30,
+              height: 30,
+              transition: "left 0.15s linear, top 0.15s linear",
+            }}
+          />
+        );
+      })}
+
+
+      <h1 className="text-9xl font-Stalinist font-light">Move</h1>
     </div>
-    </>
-  )
+  );
 }
 
-export default App
+export default App;

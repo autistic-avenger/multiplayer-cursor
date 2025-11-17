@@ -16,11 +16,11 @@ const io = new Server(server, {
 let users = {}
 
 app.get('/', (req, res) => {
-  res.send("Based Sigma!👌")
+  res.send("Based Sigma!")
 })
 
 io.on("connection", (socket) => {
-  console.log(socket.id, "Connected 👾");
+  console.log(socket.id, "Joined!");
 
   users[socket.id] = [0, 0];
 
@@ -31,7 +31,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     delete users[socket.id];
-    console.log(socket.id, "Disconnected 👾");
+    console.log(socket.id, "Left!");
   });
 });
 

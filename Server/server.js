@@ -13,25 +13,43 @@ const io = new Server(server, {
   }
 })
 
-let users = {}
-
-app.get('/', (req, res) => {
-  res.send("Based Sigma!")
-})
+let users = {};
 
 io.on("connection", (socket) => {
-  console.log(socket.id, "Joined!");
+  console.log(socket.id, "Connected");
 
-  users[socket.id] = [0, 0];
+  socket.on("join", (userData) => {
+    users[socket.id] = {
+      id: socket.id,
+      name: userData.name || "Anonymous",
+      color: userData.color || "#000000",
+      x: 0,
+      y: 0,
+    };
+    console.log(`${users[socket.id].name} (${socket.id}) Joined!`);
+    io.emit("updatedUsers", users);
+  });
 
   socket.on("positions", (data) => {
-    users[socket.id] = [data.x, data.y];
-    io.emit("updatedPos", users);
+    if (users[socket.id]) {
+      users[socket.id].x = data.x;
+      users[socket.id].y = data.y;
+      socket.broadcast.emit("updatedPos", { id: socket.id, x: data.x, y: data.y });
+    }
+  });
+
+  socket.on("click", (data) => {
+    if (users[socket.id]) {
+      io.emit("userClicked", { id: socket.id, x: data.x, y: data.y, color: users[socket.id].color });
+    }
   });
 
   socket.on("disconnect", () => {
-    delete users[socket.id];
-    console.log(socket.id, "Left!");
+    if (users[socket.id]) {
+      console.log(users[socket.id].name, "Left!");
+      delete users[socket.id];
+      io.emit("updatedUsers", users);
+    }
   });
 });
 

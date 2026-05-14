@@ -3,6 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const ClickEffect = ({ clicks }) => {
   return (
+
+
+
+
+
     <AnimatePresence>
       {clicks.map((click) => (
         <motion.div
